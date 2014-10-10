@@ -53,7 +53,7 @@
 							}
 
 							self._animateInCallbacks = null;
-
+							self.onHeroEntrance();
 						});
 					}
 				});
@@ -167,7 +167,7 @@
 		// in order for them to be available to animate by the next 
 		// view.
 		onHeroTransitionOut: function() {			
-			var heroElements = this.$("[data-hero]");
+			var heroElements = this.$("[data-hero][data-hero-active='true']");
 			if(!heroElements || heroElements.length <= 0) {
 				return;
 			}
@@ -175,6 +175,7 @@
 			heroElements.each(function(idx, item) {
 				var clone = $(item).clone();
 				clone.css("position", "fixed");
+				clone.css("z-index", "999");
 
 				var boundingRect = item.getBoundingClientRect();
 				clone.css("top", boundingRect.top);
@@ -185,6 +186,42 @@
 				window.__ember_animate_hero_elements__.set(clone.attr('data-hero'), clone);
 			});
 
+		},
+
+		onHeroEntrance: function() {
+			console.log("hero entrance");
+			var keys = Object.keys(window.__ember_animate_hero_elements__);
+			for(i=0; i<keys.length; i++) {
+				console.log("applying animation to hero element", keys[i]);
+
+				var heroShadow = $(window.__ember_animate_hero_elements__[keys[i]]);
+				var heroShadowRect = heroShadow[0].getBoundingClientRect();
+				var heroTarget = $("[data-hero-target='" + keys[i] + "']");
+				var heroTargetRect = heroTarget[0].getBoundingClientRect();
+								
+				var widthScale = heroTargetRect.width / heroShadowRect.width;
+				var heightScale = heroTargetRect.height / heroShadowRect.height;
+				var translateX = heroTargetRect.left - heroShadowRect.left;
+				var translateY = heroTargetRect.top - heroShadowRect.top;
+
+				heroTarget.css("opacity", 0);
+				heroShadow.css("transition", "all 0.5s ease");
+
+				heroShadow.animate({
+					left: heroTargetRect.left,
+					top: heroTargetRect.top,
+					width: heroTargetRect.width,
+					height: heroTargetRect.width,
+					'font-size': heroShadow.css('font-size')
+				}, 400, function() {
+					heroTarget.animate({opacity: 1},200);
+					heroShadow.animate({opacity: 0}, 200, function() {
+						heroShadow.remove();
+					});
+				});
+
+				delete window.__ember_animate_hero_elements__[keys[i]];
+			}
 		}
 	});
 

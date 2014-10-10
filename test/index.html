@@ -21,11 +21,13 @@
       <li>{{item}}</li>
     {{/each}}
     </ul>
+    <br/><br/><br/><br/><br/><br/><br/><br/>
+    <h1 data-hero-target="title">Other View!!!</h1>
   </script>
 
   <script type="text/x-handlebars" id="otherview">
-  {{#link-to 'index'}}index {{/link-to}}
-    <span data-hero="title">Other View!!!</span>
+    {{#link-to 'index'}}index {{/link-to}}
+    <span data-hero="title" data-hero-active="true">Other View!!!</span>
   </script>
 
 
