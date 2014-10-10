@@ -1,4 +1,5 @@
 (function () {
+	window.__ember_animate_hero_elements__ = Ember.Object.create();
 
 	var run,
 		destroying$;
@@ -68,6 +69,7 @@
 		willAnimateOut : Ember.K,
 		didAnimateIn : Ember.K,
 		didAnimateOut : Ember.K,
+		heroElements: Ember.K,
 
 		animateIn : run,
 		animateOut : run,
@@ -93,7 +95,7 @@
 		destroy : function (done) {
 
 			var _super = this._super;
-
+			this.onHeroTransitionOut();
 			this.onAnimateOut(done);
 
 			if (this.isAnimatingOut) {
@@ -122,7 +124,7 @@
 			this.willAnimateOut();
 			this.isAnimatingOut = true;
 
-			this.animateOut(function () {
+			this.animateOut(function () {				
 
 				this.isAnimatingOut = false;
 				this.hasAnimatedOut = true;
@@ -158,6 +160,31 @@
 			}.bind(this));
 
 			return this;
+		},
+
+		// This removes the hero elements from the current view and 
+		// places it into the <body> at their current coordinates 
+		// in order for them to be available to animate by the next 
+		// view.
+		onHeroTransitionOut: function() {			
+			var heroElements = this.$("[data-hero]");
+			if(!heroElements || heroElements.length <= 0) {
+				return;
+			}
+			console.log("storing hero elements", heroElements);
+			heroElements.each(function(idx, item) {
+				var clone = $(item).clone();
+				clone.css("position", "fixed");
+
+				var boundingRect = item.getBoundingClientRect();
+				clone.css("top", boundingRect.top);
+				clone.css("left", boundingRect.left);
+
+				$("body").append(clone);
+				
+				window.__ember_animate_hero_elements__.set(clone.attr('data-hero'), clone);
+			});
+
 		}
 	});
 
