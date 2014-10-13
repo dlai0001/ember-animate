@@ -176,6 +176,7 @@
 				var clone = $(item).clone();
 				clone.css("position", "fixed");
 				clone.css("z-index", "999");
+				clone.css("transition", "all 1s");
 
 				var boundingRect = item.getBoundingClientRect();
 				clone.css("top", boundingRect.top);
@@ -199,26 +200,19 @@
 				var heroTarget = $("[data-hero-target='" + keys[i] + "']");
 				var heroTargetRect = heroTarget[0].getBoundingClientRect();
 								
+				debugger;
 				var widthScale = heroTargetRect.width / heroShadowRect.width;
 				var heightScale = heroTargetRect.height / heroShadowRect.height;
 				var translateX = heroTargetRect.left - heroShadowRect.left;
 				var translateY = heroTargetRect.top - heroShadowRect.top;
 
-				heroTarget.css("opacity", 0);
-				heroShadow.css("transition", "all 0.5s ease");
+				//heroTarget.css("opacity", 0);				
 
-				heroShadow.animate({
-					left: heroTargetRect.left,
-					top: heroTargetRect.top,
-					width: heroTargetRect.width,
-					height: heroTargetRect.width,
-					'font-size': heroShadow.css('font-size')
-				}, 400, function() {
-					heroTarget.animate({opacity: 1},200);
-					heroShadow.animate({opacity: 0}, 200, function() {
-						heroShadow.remove();
-					});
-				});
+				var transformProps = "";
+				transformProps += "translate(" + translateX + "px," + translateY + "px) ";
+				transformProps += "scale(" + widthScale + "," + heightScale + ") ";
+
+				heroShadow.css("transform", transformProps);
 
 				delete window.__ember_animate_hero_elements__[keys[i]];
 			}
